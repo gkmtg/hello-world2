@@ -11,8 +11,6 @@ function fsExtractDeckName($psDeckDivText) {
 
 }
 
-// if this is live, this should be removed and added to utility
-
 if(isset($_GET['d']) && $_GET['d']!='index.php') {
 	$sDeckDiv = fsGenerateDeckDiv2($_GET['d']);
 	$sDeckName = fsExtractDeckName($sDeckDiv);
@@ -23,6 +21,7 @@ else {
 }
 
 /**
+ * if this is live, this should be removed and added to utility
  * returns a nice div with the appropriate functions you need for a deck
  * TODO: cards have their own mouseover stuff
  * TODO: all of the deck functions (favorite, move to deckbuilder, sort by data, ... ?)
@@ -87,7 +86,8 @@ function fsGenerateDeckDiv2($psDeckID) {
 		$sTBR .= "<div class=\"cardindeck\" ";
 		$sTBR .= "data-name=\"" . $saCardInfo['Name'] . "\" ";
 		$sTBR .= "data-cmc=\"" . $saCardInfo['CMC'] . "\" ";
-		$sTBR .= "data-types=\"" . $saCardInfo['Supertypes'] . "\"";
+		$sTBR .= "data-types=\"" . $saCardInfo['Supertypes'] . "\" ";
+		$sTBR .= "data-quantity=\"" . $value . "\"";
 		$sTBR .= ">" . $value . " <span onmouseover=\"fvViewGK('" . $sPrefVar . "')\";>" . $saCardInfo['Name'] . "</span></div>\n";
 	}
 	$sTBR .= "<img src onerror=\"fvSortDeck('" . $psDeckID . "Main','types');\">";
@@ -108,11 +108,12 @@ function fsGenerateDeckDiv2($psDeckID) {
 		$sTBR .= "<div class=\"cardindeck\" ";
 		$sTBR .= "data-name=\"" . $saCardInfo['Name'] . "\" ";
 		$sTBR .= "data-cmc=\"" . $saCardInfo['CMC'] . "\" ";
-		$sTBR .= "data-types=\"" . $saCardInfo['Supertypes'] . "\"";
+		$sTBR .= "data-types=\"" . $saCardInfo['Supertypes'] . "\" ";
+		$sTBR .= "data-quantity=\"" . $value . "\"";
 		$sTBR .= ">" . $value . " <span onmouseover=\"fvViewGK('" . $sPrefVar . "')\";>" . $saCardInfo['Name'] . "</span></div>\n";
 	}
 	$sTBR .= "</div>";
-	$sTBR .= "<img src onerror=\"setTimeout(function() {fvSortDeck('" . $psDeckID . "Side','types');}, 500);\">";
+	$sTBR .= "<img src onerror=\"setTimeout(function() {fvSortDeck('" . $psDeckID . "Side','name');}, 500);\">";
 	$sTBR .= "</div>";
 	return $sTBR;
 }
@@ -145,7 +146,7 @@ function fsToType(piGKScore) {
 
 function fvSortDeck(psDeckElID, psSortBy) {
 	peDeck = document.getElementById(psDeckElID);
-	peDeck.style.opacity=0;
+	peDeck.style.color="white";
 	setTimeout(function() {
 		var nlTemp = peDeck.getElementsByClassName('cardindeck');
 		
@@ -183,7 +184,17 @@ function fvSortDeck(psDeckElID, psSortBy) {
 			iCurrGKScore = fiGKScore(eaSorted[0].dataset['types']);
 			eHeader = document.createElement("div");
 			eHeader.classList.add("typetitle");
-			eHeader.appendChild(document.createTextNode(fsToType(iCurrGKScore)));
+
+			sTitleHeader = fsToType(iCurrGKScore);
+			$iTypeCounter = 0;
+			for (var iLoopAll = eaSorted.length - 1; iLoopAll >= 0; iLoopAll--) {
+				if(fiGKScore(eaSorted[iLoopAll].dataset['types'])==iCurrGKScore) {
+					$iTypeCounter += parseInt(eaSorted[iLoopAll].dataset['quantity']);
+				}
+			}
+			sTitleHeader += " (" + $iTypeCounter + ")";
+
+			eHeader.appendChild(document.createTextNode(sTitleHeader));
 			peDeck.appendChild(eHeader);
 		}
 		for(i = 0; i < eaSorted.length; i++) {
@@ -192,24 +203,34 @@ function fvSortDeck(psDeckElID, psSortBy) {
 					iCurrGKScore = fiGKScore(eaSorted[i].dataset['types']);
 					eHeader = document.createElement("div");
 					eHeader.classList.add("typetitle");
-					eHeader.appendChild(document.createTextNode(fsToType(iCurrGKScore)));
+
+					sTitleHeader = fsToType(iCurrGKScore);
+					$iTypeCounter = 0;
+					for (var iLoopAll = eaSorted.length - 1; iLoopAll >= 0; iLoopAll--) {
+						if(fiGKScore(eaSorted[iLoopAll].dataset['types'])==iCurrGKScore) {
+							$iTypeCounter += parseInt(eaSorted[iLoopAll].dataset['quantity']);
+						}
+					}
+					sTitleHeader += " (" + $iTypeCounter + ")";
+
+					eHeader.appendChild(document.createTextNode(sTitleHeader));
 					peDeck.appendChild(eHeader);
 				}
 			}
 			peDeck.appendChild(eaSorted[i]);
 		}
 	}, 300);
-	setTimeout(function() {	peDeck.style.opacity=1; }, 500);
+	setTimeout(function() {	peDeck.style.color="black"; }, 500);
 }
 
 </script>
 <!-- these need to be added to universal css -->
 <style>
 .indivDeck {
-	transition: opacity 0.30s;
-	-o-transition: opacity 0.30s;
-	-moz-transition: opacity 0.30s;
-	-webkit-transition: opacity 0.30s;
+	transition: all 0.30s;
+	-o-transition: all 0.30s;
+	-moz-transition: all 0.30s;
+	-webkit-transition: all 0.30s;
 }
 .decktitle {
 	font-size: x-large;
