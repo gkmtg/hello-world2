@@ -962,6 +962,10 @@ function fvRealStart(psWhichSVG) {
 
 }
 
+function fsGetUser() {
+	return getCookie('dci');
+}
+
 function fvMatchPopUp(psTID,psMID,psPlayer0,psP0First,psP0Last,psPlayer1,psP1First,psP1Last) {
 	resultTID.value = psTID;
 	resultMID.value = psMID;
@@ -973,6 +977,16 @@ function fvMatchPopUp(psTID,psMID,psPlayer0,psP0First,psP0Last,psPlayer1,psP1Fir
 	p1LastName.innerHTML = psP1Last;
 	pass0.dataset.dci = psPlayer0.slice(0,4);
 	pass1.dataset.dci = psPlayer1.slice(0,4);
+
+	if(psPlayer0 == fsGetUser()) {
+		pass0.value = psPlayer0.slice(0,4);
+		fvDCIPasswordCheck(pass0);
+	}
+	if(psPlayer1 == fsGetUser()) {
+		pass1.value = psPlayer1.slice(0,4);
+		fvDCIPasswordCheck(pass1);
+	}
+
 
 	g1.value=50;
 	g2.value=50;
